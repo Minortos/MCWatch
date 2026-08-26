@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Les droits de l'APP.
+
+  Ils furent longtemps les mêmes que ceux du scanner. Sparkle les a séparés :
+  voir MCWatchScan.entitlements, qui garde le socle nu.
+
+  Quatre entrées, et c'est tout ce que l'app sait faire :
+
+  · app-sandbox     l'enferme dans ~/Library/Containers/<identifiant>/Data.
+                    Tout le reste du disque lui est fermé, y compris son propre
+                    dossier d'installation.
+  · network.client  connexions SORTANTES uniquement : le ping TCP des serveurs
+                    Minecraft et l'API HTTPS de Shodan. Mesuré : sans ce droit,
+                    la connexion ne se refuse pas, elle reste pendante — le
+                    droit travaille réellement.
+  · files.user-selected.read-only
+                    le simple « Ouvrir… » : l'app ne peut lire QUE le fichier
+                    que l'utilisateur a lui-même désigné dans le sélecteur
+                    système, et rien d'autre. Sert au bouton « Importer depuis
+                    le CLI Shodan », qui remplace l'ancienne lecture SILENCIEUSE
+                    de ~/.config/shodan/api_key. Même service rendu, mais c'est
+                    l'utilisateur qui désigne le fichier — pas l'app qui se sert.
+                    Lecture seule : rien ne peut être écrit hors du conteneur.
+  · temporary-exception.mach-lookup.global-name
+                    DEUX noms, et la SEULE exception de ce fichier.
+
+                    Une app confinée ne peut pas se mettre à jour elle-même :
+                    remplacer le paquet dans /Applications est très exactement
+                    ce que le bac à sable lui interdit — y compris sur son
+                    propre dossier d'installation. Sparkle contourne l'impasse
+                    de la seule façon possible : l'installation est faite par un
+                    service XPC séparé, qui n'est PAS confiné, et à qui l'app
+                    parle par deux services mach nommés d'après son identifiant
+                    — `-spks` le lanceur, `-spki` l'installateur. Or un
+                    processus confiné ne peut joindre un service mach que si le
+                    nom en est déclaré ici. D'où ces deux lignes, et pas une de
+                    plus.
+
+                    ⚠️ « temporary-exception » sonne plus grave que ce n'est :
+                    le mot vise la revue de l'App Store, où ces droits demandent
+                    justification. Hors App Store, il n'est ni restreint, ni
+                    soumis à profil d'approvisionnement — la règle énoncée plus
+                    bas tient donc toujours. Mais il élargit RÉELLEMENT la
+                    surface de l'app, et c'est le prix, payé en connaissance de
+                    cause, d'une mise à jour qui s'installe seule. Le scanner ne
+                    le paie pas : il n'a rien à mettre à jour.
+
+  Ces quatre droits sont NON RESTREINTS : ils ne demandent aucun profil
+  d'approvisionnement et aucun compte développeur payant. C'est délibéré, et
+  c'est ce qui rend ce fichier utilisable tel quel par n'importe qui recompile
+  le projet avec son propre certificat.
+
+  ⚠️ Ce qu'il ne faut PAS ajouter ici, et pourquoi :
+
+  · network.server                      rien n'écoute, jamais.
+  · files.user-selected.read-WRITE      la lecture suffit : on importe une clé,
+                                        on ne modifie jamais le fichier d'un
+                                        autre logiciel.
+  · files.downloads / pictures / etc.   aucun dossier entier n'a à être ouvert.
+  · application-groups                  inutile : l'app et le scanner partagent
+                                        déjà un conteneur par leur identifiant
+                                        commun. L'ajouter graverait
+                                        l'identifiant d'équipe ici.
+  · keychain-access-groups              droit RESTREINT : sans profil
+                                        d'approvisionnement, AMFI tue le
+                                        processus au lancement (SIGKILL,
+                                        mesuré). C'est pourquoi la clé reste
+                                        dans le trousseau CLASSIQUE, qui lui
+                                        fonctionne en bac à sable.
+  · com.apple.security.cs.*             le runtime durci est actif SANS aucune
+                                        exception. C'est un état rare : ni
+                                        injection de code non signé, ni
+                                        DYLD_*, ni débogueur, ni JIT. Chaque
+                                        exception ici rouvrirait une porte.
+  · get-task-allow                      SwiftPM en génère un pour ses binaires
+                                        de débogage. Il ne doit jamais atteindre
+                                        le paquet livré : il autorise n'importe
+                                        quel processus à s'attacher au nôtre —
+                                        donc à lire la clé API en mémoire.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-only</key>
+	<true/>
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+	<array>
+		<string>com.minortos.mcwatch.app-spks</string>
+		<string>com.minortos.mcwatch.app-spki</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Le fil des versions de MC Watch, lu par Sparkle à chaque vérification.
+
+  Il est servi en brut depuis la branche principale du dépôt, et non par une
+  page GitHub : une branche existe déjà, une page serait un service de plus à
+  maintenir et à laisser expirer. Les archives, elles, vivent dans les
+  « releases » — GitHub sert mal les gros fichiers depuis un dépôt.
+
+  Rien ici n'a besoin d'être secret. Chaque entrée porte une signature EdDSA
+  que l'app vérifie avec la clé publique gravée dans son Info.plist : ce fichier
+  peut être lu, copié, republié — il ne peut pas être falsifié utilement.
+
+  ⚠️ Écrit par publier.sh. Les entrées s'ajoutent, ne se retirent jamais : une
+     version supprimée d'ici cesse d'exister pour qui voudrait y revenir.
+-->
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>MC Watch</title>
+    <link>https://raw.githubusercontent.com/Minortos/MCWatch/main/appcast.xml</link>
+    <description>Updates for MC Watch.</description>
+    <language>en</language>
+    <item>
+      <title>2.0</title>
+      <pubDate>Thu, 27 Aug 2026 12:18:48 +0000</pubDate>
+      <link>https://github.com/Minortos/MCWatch/releases/tag/v2.0</link>
+      <sparkle:releaseNotesLink>https://github.com/Minortos/MCWatch/releases/tag/v2.0</sparkle:releaseNotesLink>
+      <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/Minortos/MCWatch/releases/download/v2.0/MC-Watch-2.0.dmg"
+                 sparkle:version="160"
+                 sparkle:shortVersionString="2.0"
+                 type="application/x-apple-diskimage"
+                 sparkle:edSignature="3IRCYjo2CX27F0t1nKYa5pxMZXP0JmMOjMzX53eZ2w2Ri+r8ry9/8CBIADg0XhFtBRYikh5POh76cnsk3wxfBQ==" length="3850622" />
+    </item>
+  </channel>
+</rss>

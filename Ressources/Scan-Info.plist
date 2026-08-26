@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Identité de paquet du scanner, embarquée dans le Mach-O lui-même
+  (section __TEXT,__info_plist) faute de dossier où la poser : le scanner est un
+  exécutable nu dans Contents/MacOS/, pas un paquet.
+
+  Elle n'est pas décorative, elle est INDISPENSABLE au bac à sable. Un Mach-O
+  sans identité n'a pas de conteneur où être enfermé : macOS le tue au
+  lancement (EXC_BREAKPOINT, mesuré) dès que l'entitlement app-sandbox est posé.
+
+  ⚠️ `CFBundleIdentifier` est VOLONTAIREMENT identique à celui de l'app.
+  C'est lui qui nomme le conteneur : deux exécutables qui le partagent
+  partagent le même bac à sable, donc les mêmes données. C'est ce qui évite
+  un App Group — donc l'entitlement `application-groups`, donc l'identifiant
+  d'équipe codé en dur dans un fichier de droits. Quelqu'un qui clone ce dépôt
+  et recompile avec son propre certificat n'a rien à modifier.
+
+  Vérifié : l'app et le scanner atterrissent bien dans
+  ~/Library/Containers/com.minortos.mcwatch.app/Data et se relisent l'un
+  l'autre ; toute écriture hors de là est refusée.
+-->
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>com.minortos.mcwatch.app</string>
+	<key>CFBundleName</key>
+	<string>MCWatchScan</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0</string>
+</dict>
+</plist>

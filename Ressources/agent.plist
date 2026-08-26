@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- ⚠️ Cette étiquette est GRAVÉE DANS LE MARBRE une fois l'app publiée.
+	     Voir l'avertissement en tête d'Agent.swift : BTM garde un
+	     enregistrement persistant indexé par cette chaîne, et n'en redérive
+	     jamais l'identité de code. La changer chez un utilisateur qui a déjà
+	     l'app revient à lui laisser un agent mort. -->
+	<key>Label</key>
+	<string>com.minortos.mcwatch.surveillance</string>
+	<!-- Chemin relatif au paquet : c'est ce que demande SMAppService. -->
+	<key>BundleProgram</key>
+	<string>Contents/MacOS/MCWatchScan</string>
+	<key>StartInterval</key>
+	<integer>600</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>LowPriorityIO</key>
+	<true/>
+</dict>
+</plist>

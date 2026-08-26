@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Les droits du SCANNER — le socle, et rien de plus.
+
+  Ce fichier a été détaché de celui de l'app le jour où Sparkle est entré dans
+  le projet. L'app a désormais besoin d'une exception pour joindre les services
+  mach de son installateur ; le scanner, lui, n'a jamais rien à mettre à jour.
+  Lui laisser cette exception aurait été lui ouvrir une porte dont il n'a pas
+  l'usage — le contraire exact de ce que ce fichier défend.
+
+  Il y a une seconde raison, moins visible et plus impérieuse. Ce binaire est le
+  programme de l'agent launchd, et BTM ne redérive JAMAIS l'identité de code
+  qu'il a enregistrée : le trio identifiant / équipe / étiquette est figé. Tout
+  ce qui touche à la signature de CE binaire se paie potentiellement par un
+  agent tué au démarrage. La façon la plus sûre de ne pas casser la
+  surveillance, c'est que ce fichier ne bouge pas.
+
+  Les trois droits, et ce qu'ils font, sont documentés en détail dans
+  MCWatch.entitlements — leur source commune. Ils sont ici à l'identique :
+  bac à sable, réseau sortant, et le « Ouvrir… » standard.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-only</key>
+	<true/>
+</dict>
+</plist>
