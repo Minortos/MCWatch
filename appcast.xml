@@ -32,5 +32,17 @@
                  type="application/x-apple-diskimage"
                  sparkle:edSignature="3IRCYjo2CX27F0t1nKYa5pxMZXP0JmMOjMzX53eZ2w2Ri+r8ry9/8CBIADg0XhFtBRYikh5POh76cnsk3wxfBQ==" length="3850622" />
     </item>
+    <item>
+      <title>2.0.1</title>
+      <pubDate>Thu, 27 Aug 2026 17:51:42 +0000</pubDate>
+      <link>https://github.com/Minortos/MCWatch/releases/tag/v2.0.1</link>
+      <sparkle:releaseNotesLink>https://github.com/Minortos/MCWatch/releases/tag/v2.0.1</sparkle:releaseNotesLink>
+      <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/Minortos/MCWatch/releases/download/v2.0.1/MC-Watch-2.0.1.dmg"
+                 sparkle:version="162"
+                 sparkle:shortVersionString="2.0.1"
+                 type="application/x-apple-diskimage"
+                 sparkle:edSignature="EzNA4y/AH6H0jgzbIebc0mwpaWsLuNpzpCJET2AU3no1EJpZ6Kqa8WXuoDw7BYQ7mWc7Fc0F3iF6Y4jf0/WnCw==" length="3861409" />
+    </item>
   </channel>
 </rss>
