@@ -25,16 +25,9 @@ public enum Solde {
         }
         guard let cle, let infos = try? await Shodan(cle: cle).infos() else { return etat }
 
-        // Une remontée du solde = réinitialisation (ou achat) : on retient le jour.
-        if let ancien = etat.solde, infos.creditsRecherche > ancien {
-            etat.jourReinit = Calendar.current.component(.day, from: maintenant)
-            etat.reinits.append(jour(maintenant))
-            etat.reinits = Array(etat.reinits.suffix(12))
-        }
-        etat.solde = infos.creditsRecherche
-        etat.plafond = infos.plafondRecherche
-        etat.plan = infos.plan
-        etat.vu = Tour.horodatage(maintenant)
+        etat = integrer(etat, solde: infos.creditsRecherche,
+                        plafond: infos.plafondRecherche, plan: infos.plan,
+                        maintenant: maintenant)
         // Sans trace, un solde qui ne s'enregistre pas se traduirait par une
         // interrogation de l'API à chaque tour — le bridage horaire reposant
         // justement sur `vu`, qu'on vient de ne pas écrire.
@@ -43,6 +36,35 @@ public enum Solde {
             stockage.journal("credit balance not saved: \(error)",
                              horodatage: Tour.horodatage(maintenant))
         }
+        return etat
+    }
+
+    /// Ce qu'une mesure du solde change dans l'état, sans rien demander à personne.
+    ///
+    /// Extraite de `relever` parce que c'est une **décision**, pas un appel
+    /// réseau : « le solde a remonté, donc le quota s'est réinitialisé
+    /// aujourd'hui » est une règle, et une règle se vérifie. Tant qu'elle vivait
+    /// entre un `await` et une écriture disque, aucun test ne pouvait l'atteindre
+    /// sans interroger Shodan pour de vrai.
+    ///
+    /// ⚠️ La remontée est le **seul** signal disponible : l'API ne dit jamais
+    /// quand le quota se renouvelle. Un achat de crédits produit donc la même
+    /// observation qu'une réinitialisation, et sera compté comme telle — c'est
+    /// assumé, faute de mieux.
+    static func integrer(_ etat: Credits, solde: Int, plafond: Int, plan: String,
+                         maintenant: Date) -> Credits {
+        var etat = etat
+        if let ancien = etat.solde, solde > ancien {
+            etat.jourReinit = Calendar.current.component(.day, from: maintenant)
+            etat.reinits.append(jour(maintenant))
+            // Douze dates suffisent à voir une régularité sur un an, et bornent
+            // un fichier qui grandirait sinon jusqu'à la fin des temps.
+            etat.reinits = Array(etat.reinits.suffix(12))
+        }
+        etat.solde = solde
+        etat.plafond = plafond
+        etat.plan = plan
+        etat.vu = Tour.horodatage(maintenant)
         return etat
     }
 

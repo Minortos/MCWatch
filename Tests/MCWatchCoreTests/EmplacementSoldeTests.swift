@@ -166,6 +166,90 @@ struct SoldeTests {
         #expect(Solde.jour(date(2026, 8, 24)) == "2026-08-24")
         #expect(Solde.jour(date(2026, 1, 5)) == "2026-01-05", "les zéros de tête sont conservés")
     }
+
+    // MARK: - Ce qu'une mesure change
+
+    /// Un état déjà mesuré, pour partir d'ailleurs que de zéro.
+    func mesure(solde: Int?, reinits: [String] = []) -> Credits {
+        var c = Credits()
+        c.solde = solde
+        c.reinits = reinits
+        return c
+    }
+
+    /// Au tout premier relevé il n'y a rien à comparer : annoncer une
+    /// réinitialisation reviendrait à en inventer une le jour de l'installation.
+    @Test("le premier relevé ne déclare aucune réinitialisation")
+    func premierReleve() {
+        let apres = Solde.integrer(mesure(solde: nil), solde: 100, plafond: 100,
+                                   plan: "dev", maintenant: date(2026, 3, 10))
+        #expect(apres.solde == 100)
+        #expect(apres.jourReinit == nil)
+        #expect(apres.reinits.isEmpty)
+    }
+
+    /// Le cas de tous les jours : on dépense, le solde descend. Rien à retenir.
+    @Test("un solde qui baisse ne retient rien")
+    func soldeQuiBaisse() {
+        let apres = Solde.integrer(mesure(solde: 100), solde: 97, plafond: 100,
+                                   plan: "dev", maintenant: date(2026, 3, 10))
+        #expect(apres.solde == 97)
+        #expect(apres.jourReinit == nil)
+        #expect(apres.reinits.isEmpty)
+    }
+
+    /// La remontée est le seul signal que l'API laisse passer : c'est elle,
+    /// et elle seule, qui date le renouvellement du quota.
+    @Test("un solde qui remonte date la réinitialisation")
+    func soldeQuiRemonte() {
+        let apres = Solde.integrer(mesure(solde: 3), solde: 100, plafond: 100,
+                                   plan: "dev", maintenant: date(2026, 3, 10))
+        #expect(apres.jourReinit == 10)
+        #expect(apres.reinits == ["2026-03-10"])
+    }
+
+    /// Strictement supérieur : deux relevés identiques arrivent à chaque heure
+    /// d'un mois où l'on ne cherche rien, et n'annoncent aucun renouvellement.
+    @Test("un solde inchangé n'est pas une réinitialisation")
+    func soldeInchange() {
+        let apres = Solde.integrer(mesure(solde: 100), solde: 100, plafond: 100,
+                                   plan: "dev", maintenant: date(2026, 3, 10))
+        #expect(apres.jourReinit == nil)
+        #expect(apres.reinits.isEmpty)
+    }
+
+    /// ⚠️ La borne. Sans elle, ce tableau grandit d'une ligne par mois et pour
+    /// toujours, dans un fichier qu'on ne relit jamais.
+    @Test("l'historique des réinitialisations est borné à douze")
+    func historiqueBorne() {
+        let douze = (1...12).map { "2025-\(String(format: "%02d", $0))-01" }
+        let apres = Solde.integrer(mesure(solde: 3, reinits: douze), solde: 100,
+                                   plafond: 100, plan: "dev",
+                                   maintenant: date(2026, 3, 10))
+        #expect(apres.reinits.count == 12)
+        #expect(apres.reinits.last == "2026-03-10", "la plus récente est conservée")
+        #expect(apres.reinits.first == "2025-02-01", "la plus ancienne est tombée")
+    }
+
+    /// `vu` porte le bridage horaire de `relever` : tant qu'il est frais,
+    /// l'API n'est pas rappelée. Ne pas l'écrire ferait interroger Shodan à
+    /// chaque tour de l'agent, soit six fois par heure au lieu d'une.
+    @Test("la date du relevé est écrite même quand rien d'autre ne change")
+    func dateToujoursEcrite() throws {
+        let apres = Solde.integrer(mesure(solde: 100), solde: 97, plafond: 100,
+                                   plan: "dev", maintenant: date(2026, 3, 10))
+        let vu = try #require(apres.vu)
+        let relu = try #require(Solde.analyser(vu))
+        #expect(composantes(relu) == (2026, 3, 10))
+    }
+
+    @Test("le plafond et le plan suivent la mesure")
+    func plafondEtPlan() {
+        let apres = Solde.integrer(mesure(solde: 100), solde: 97, plafond: 300,
+                                   plan: "freelancer", maintenant: date(2026, 3, 10))
+        #expect(apres.plafond == 300)
+        #expect(apres.plan == "freelancer")
+    }
 }
 
 /// Une surveillance enregistrée qui ne tourne plus.
