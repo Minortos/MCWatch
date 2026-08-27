@@ -9517,6 +9517,64 @@
         }
       }
     },
+    "Monitoring not responding" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Überwachung reagiert nicht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supervisión sin respuesta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surveillance sans réponse"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Monitoraggio non risponde"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bewaking reageert niet"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Monitorowanie nie odpowiada"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Monitoramento sem resposta"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Наблюдение не отвечает"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "İzleme yanıt vermiyor"
+          }
+        }
+      }
+    },
     "Monitoring stopped" : {
       "localizations" : {
         "de" : {
@@ -10209,6 +10267,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bu macOS hesabı için kayıtlı anahtar yok."
+          }
+        }
+      }
+    },
+    "No scan since %@. In System Settings ▸ General ▸ Login Items & Extensions, switch MC Watch off and back on." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kein Durchlauf seit %@. Schalten Sie MC Watch in Systemeinstellungen ▸ Allgemein ▸ Anmeldeobjekte & Erweiterungen aus und wieder ein."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ningún sondeo desde %@. En Ajustes del Sistema ▸ General ▸ Ítems de inicio y extensiones, desactive y vuelva a activar MC Watch."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun relevé depuis %@. Dans Réglages Système ▸ Général ▸ Ouverture et extensions, désactivez puis réactivez MC Watch."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nessuna scansione da %@. In Impostazioni di Sistema ▸ Generali ▸ Elementi login ed estensioni, disattiva e riattiva MC Watch."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Geen ronde sinds %@. Zet MC Watch uit en weer aan in Systeeminstellingen ▸ Algemeen ▸ Inlogonderdelen en extensies."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Brak skanowania od %@. W Ustawieniach systemowych ▸ Ogólne ▸ Elementy logowania i rozszerzenia wyłącz i włącz ponownie MC Watch."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nenhuma varredura desde %@. Em Ajustes do Sistema ▸ Geral ▸ Itens de Início e Extensões, desative e reative o MC Watch."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Опросов не было с %@. В Системных настройках ▸ Основные ▸ Объекты входа и расширения выключите и снова включите MC Watch."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ tarihinden beri tarama yok. Sistem Ayarları ▸ Genel ▸ Giriş Ögeleri ve Uzantılar bölümünde MC Watch'ı kapatıp yeniden açın."
           }
         }
       }

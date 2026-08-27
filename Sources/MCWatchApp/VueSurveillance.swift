@@ -145,9 +145,9 @@ struct VueSurveillance: View {
     /// distinction, et non une signalétique inventée ici.
     private var symboleEtat: String {
         switch modele.etatAgent {
-        case .active, .arretee:                        "circle.fill"
-        case .attenteAutorisation, .impossible:        "exclamationmark.triangle.fill"
-        case .introuvable, .inconnu:                   "questionmark.circle.fill"
+        case .active, .arretee:                            "circle.fill"
+        case .attenteAutorisation, .impossible, .enPanne:  "exclamationmark.triangle.fill"
+        case .introuvable, .inconnu:                       "questionmark.circle.fill"
         }
     }
 
@@ -155,9 +155,9 @@ struct VueSurveillance: View {
     /// thème et les réglages d'accessibilité. Aucune valeur n'est décidée ici.
     private var teinteEtat: Color {
         switch modele.etatAgent {
-        case .active:                                  .green
-        case .attenteAutorisation, .impossible:        .orange
-        case .arretee, .introuvable, .inconnu:         .secondary
+        case .active:                                      .green
+        case .attenteAutorisation, .impossible, .enPanne:  .orange
+        case .arretee, .introuvable, .inconnu:             .secondary
         }
     }
 
@@ -166,6 +166,11 @@ struct VueSurveillance: View {
         switch modele.etatAgent {
         case .impossible:
             modele.avertissementEmplacement ?? modele.etatAgent.libelle
+        // Le seul état dont le remède voyage avec lui : le classement l'affiche
+        // aussi, et une phrase écrite ici serait invisible pour qui n'ouvre
+        // jamais ce volet.
+        case .enPanne:
+            modele.etatAgent.remede ?? modele.etatAgent.libelle
         case .attenteAutorisation, .arretee, .introuvable, .inconnu:
             String(localized: """
                 Monitoring is switched off in System Settings ▸ General ▸ \

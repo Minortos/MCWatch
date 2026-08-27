@@ -115,12 +115,12 @@ struct VueClassement: View {
 
     private var entete: some View {
         VStack(alignment: .leading) {
-            // Bandeau d'emplacement : affiché SEULEMENT quand la surveillance
-            // est réellement impossible. Le cas « hors Applications » est
+            // Bandeau : la surveillance est impossible d'ici, ou elle a cessé
+            // de tourner. Le cas « hors Applications » n'y figure pas et est
             // signalé ailleurs (accueil, et au clic sur la surveillance) —
             // l'afficher en permanence reviendrait à harceler quelqu'un qui
-            // range ses apps où il veut.
-            if modele.emplacementBloquant, let avertissement = modele.avertissementEmplacement {
+            // range ses apps où il veut. Le tri est fait par `alerteEnTete`.
+            if let avertissement = modele.alerteEnTete {
                 Label(avertissement, systemImage: "exclamationmark.triangle.fill")
                     .font(.callout)
                     .foregroundStyle(.orange)

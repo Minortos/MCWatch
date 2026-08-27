@@ -32,7 +32,7 @@ Updates…** menu item and the four lines under Settings → About.
 swift test
 ```
 
-192 tests, no setup, no network, no Shodan credits, under a second. They cover
+198 tests, no setup, no network, no Shodan credits, under a second. They cover
 `MCWatchCore` only — the ping protocol, query building, filtering, the scan
 merge, both storage backends, and the attack surfaces. Views are deliberately
 left out.

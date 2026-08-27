@@ -167,3 +167,73 @@ struct SoldeTests {
         #expect(Solde.jour(date(2026, 1, 5)) == "2026-01-05", "les zéros de tête sont conservés")
     }
 }
+
+/// Une surveillance enregistrée qui ne tourne plus.
+///
+/// Le 2026-08-27, `SMAppService.status` a répondu « activé » pendant une heure
+/// alors que launchd avait renoncé à lancer le scanner. L'app affichait
+/// « Surveillance active » devant une surveillance morte. Ces tests tiennent la
+/// règle qui a remplacé cette confiance : c'est la fraîcheur du dernier relevé
+/// qui fait foi, et rien d'autre.
+@Suite("Panne silencieuse de la surveillance")
+struct PanneAgentTests {
+
+    /// Le pas de l'agent est de dix minutes, la panne est déclarée à trois
+    /// réveils manqués. Toutes les durées d'ici en découlent.
+    let seuil = Double(Surveillance.pas * Agent.reveilsAvantPanne) * 60   // 1800 s
+    let maintenant = Date(timeIntervalSince1970: 1_800_000_000)
+
+    /// Une app fraîchement installée n'a pas encore de liste, donc pas de
+    /// relevé. Rien à conclure — et surtout pas une panne.
+    @Test("sans aucun relevé, on n'accuse personne")
+    func jamaisReleve() {
+        #expect(Agent.estEnPanne(dernierReleve: nil, maintenant: maintenant,
+                                 eveilDepuis: 86_400) == false)
+    }
+
+    @Test("un relevé récent, tout va bien")
+    func releveFrais() {
+        let recent = maintenant.addingTimeInterval(-60)
+        #expect(Agent.estEnPanne(dernierReleve: recent, maintenant: maintenant,
+                                 eveilDepuis: 86_400) == false)
+    }
+
+    @Test("trois réveils manqués sur une machine éveillée : c'est une panne")
+    func panneAvouee() {
+        let vieux = maintenant.addingTimeInterval(-seuil - 1)
+        #expect(Agent.estEnPanne(dernierReleve: vieux, maintenant: maintenant,
+                                 eveilDepuis: 86_400))
+    }
+
+    /// ⚠️ LE test qui compte, et le seul faux positif que le dispositif pouvait
+    /// produire : un Mac qui a dormi huit heures rouvre avec un dernier relevé
+    /// vieux de huit heures, sans que rien ne soit cassé — launchd rattrape son
+    /// retard dans la minute qui suit. `systemUptime` ne compte QUE le temps
+    /// éveillé : au réveil il vaut quelques secondes, donc aucune panne.
+    @Test("au réveil du Mac, un vieux relevé n'accuse pas la surveillance")
+    func sortieDeVeille() {
+        let huitHeures = maintenant.addingTimeInterval(-8 * 3600)
+        #expect(Agent.estEnPanne(dernierReleve: huitHeures, maintenant: maintenant,
+                                 eveilDepuis: 30) == false)
+    }
+
+    /// La borne est stricte des deux côtés : pile au seuil, rien n'est déclaré.
+    /// Un relevé peut légitimement arriver à la seconde près.
+    @Test("pile au seuil, aucune panne")
+    func borneExacte() {
+        let pile = maintenant.addingTimeInterval(-seuil)
+        #expect(Agent.estEnPanne(dernierReleve: pile, maintenant: maintenant,
+                                 eveilDepuis: 86_400) == false)
+    }
+
+    /// L'état porte la date, parce que le message la montre : « aucun relevé
+    /// depuis 15:56 » se vérifie d'un coup d'œil, « la surveillance est en
+    /// panne » se subit.
+    @Test("l'état en panne porte la date du dernier relevé")
+    func etatPorteLaDate() {
+        let vieux = maintenant.addingTimeInterval(-seuil - 1)
+        #expect(Agent.Etat.enPanne(depuis: vieux) != Agent.Etat.active)
+        #expect(Agent.Etat.enPanne(depuis: vieux).remede != nil)
+        #expect(Agent.Etat.active.remede == nil)
+    }
+}

@@ -301,7 +301,7 @@ public final class Modele {
         credits = stockage.credits()
         nombreListes = stockage.listerSlugs().count
         adressesSurveillees = stockage.cibles(Surveillance.slug)
-        etatAgent = Agent.etat
+        etatAgent = Agent.etat(dernierReleve: dernierReleve)
         recalculer()
         majSelection()   // les serveurs ont pu être remplacés sous la sélection
     }
@@ -536,7 +536,7 @@ public final class Modele {
     ///
     /// C'est un appel système : à demander sur un geste — l'ouverture du volet,
     /// le retour au premier plan — et jamais depuis le corps d'une vue.
-    func relireEtatAgent() { etatAgent = Agent.etat }
+    func relireEtatAgent() { etatAgent = Agent.etat(dernierReleve: dernierReleve) }
 
     /// Enregistre l'agent s'il ne l'a jamais été, et se tait sinon.
     ///
@@ -562,12 +562,18 @@ public final class Modele {
         // rien n'est demandé à l'utilisateur. Ce qu'on ne veut surtout pas
         // rattraper, c'est `.attenteAutorisation` — là, macOS reposerait sa
         // question à chaque lancement, par-dessus un refus explicite.
-        guard Agent.etatsRattrapables.contains(Agent.etat) else {
-            etatAgent = Agent.etat
+        //
+        // `.enPanne` n'est pas rattrapable non plus, et c'est délibéré : on a
+        // mesuré que réenregistrer depuis l'app ne relance pas un service que
+        // launchd a abandonné. Le seul geste qui marche est celui que
+        // `Etat.remede` demande à l'utilisateur.
+        let etat = Agent.etat(dernierReleve: dernierReleve)
+        guard Agent.etatsRattrapables.contains(etat) else {
+            etatAgent = etat
             return
         }
         if let probleme = Agent.demarrer() { message = "⚠︎ " + probleme }
-        etatAgent = Agent.etat
+        etatAgent = Agent.etat(dernierReleve: dernierReleve)
     }
 
     /// L'app tourne-t-elle d'un endroit où la surveillance survivra ?
@@ -577,6 +583,18 @@ public final class Modele {
     /// mourrait à la fermeture. Voir `Emplacement`.
     var avertissementEmplacement: String? { Emplacement.explication }
     var emplacementBloquant: Bool { Emplacement.estBloquant }
+
+    /// L'avertissement à porter en tête du classement, ou `nil` si tout va bien.
+    ///
+    /// Deux situations seulement méritent d'interrompre la lecture : l'app
+    /// tourne d'un endroit d'où la surveillance ne survivrait pas, et la
+    /// surveillance ne tourne plus du tout. Les autres états s'expliquent très
+    /// bien dans les réglages, là où l'on va quand on se pose la question ;
+    /// celui-ci doit trouver quelqu'un qui, précisément, ne se la pose pas.
+    var alerteEnTete: String? {
+        if emplacementBloquant { return avertissementEmplacement }
+        return etatAgent.remede
+    }
 
     /// Relevé immédiat, sans attendre l'agent.
     func releverMaintenant() async {
